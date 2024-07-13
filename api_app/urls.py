@@ -1,7 +1,6 @@
 from django.urls import include, path
 from drf_spectacular.views import SpectacularSwaggerView, SpectacularAPIView
-from api_app.views import AuthView, AccountCreateAPIView, RefreshView
-
+from api_app.views import AuthView, AccountCreateAPIView, RefreshView, BicycleListAPIView
 
 urlpatterns = [
     path('schema/', SpectacularAPIView.as_view(), name='schema'),
@@ -9,4 +8,5 @@ urlpatterns = [
     path('auth/', AuthView.as_view()),
     path('create-account/', AccountCreateAPIView.as_view()),
     path('refresh-token/', RefreshView.as_view()),
+    path('bicycles/', BicycleListAPIView.as_view(), name='bicycle-list'),
 ]

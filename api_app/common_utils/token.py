@@ -19,7 +19,7 @@ class RefreshToken(_RefreshToken):
         включая IP-адрес, пользовательский агент и идентификатор устройства, если они доступны в запросе. Это позволяет
          отслеживать активные токены пользователя. """
         # print(user)
-        user_id = getattr(user, 'email')
+        user_id = getattr(user, api_settings.USER_ID_FIELD)
         if not isinstance(user_id, int):
             user_id = str(user_id)
 

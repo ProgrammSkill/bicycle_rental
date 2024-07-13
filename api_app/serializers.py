@@ -2,7 +2,7 @@ from django.contrib.auth import password_validation
 from django.contrib.auth.hashers import check_password
 from rest_framework.exceptions import ValidationError
 from api_app.common_utils.token import get_token
-from api_app.models import User
+from api_app.models import User, Bicycle, Rental
 from rest_framework import serializers
 
 
@@ -92,3 +92,9 @@ class AccountCreateSerializer(serializers.ModelSerializer):
         instance.set_password(validated_data['password'])
         instance.save()
         return instance
+
+
+class BicycleSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Bicycle
+        fields = '__all__'

@@ -6,8 +6,8 @@ from django.db.transaction import atomic
 from rest_framework_simplejwt.views import TokenRefreshView
 from rest_framework_simplejwt.exceptions import InvalidToken, TokenError
 from api_app.common_utils.token import get_token
-from api_app.serializers import AccountCreateSerializer, AuthSerializer
-from .models import User
+from api_app.serializers import AccountCreateSerializer, AuthSerializer, BicycleSerializer
+from .models import User, Bicycle
 from .common_utils.serializers import TokenRefreshSerializer
 from .swagger_content import account
 
@@ -56,3 +56,12 @@ class RefreshView(TokenRefreshView):
             raise InvalidToken(e.args[0])
 
         return Response(serializer.validated_data, status=status.HTTP_200_OK)
+
+
+class BicycleListAPIView(generics.ListAPIView):
+    serializer_class = BicycleSerializer
+    # permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        queryset = Bicycle.objects.filter(status='available')
+        return queryset

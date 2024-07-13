@@ -86,8 +86,8 @@ SIMPLE_JWT = {
     'ROTATE_REFRESH_TOKENS': True,
     'BLACKLIST_AFTER_ROTATION': False,
     'AUTH_HEADER_TYPES': ('Bearer', 'Token',),
-    'USER_ID_FIELD': 'username',
-    'USER_ID_CLAIM': 'username',
+    'USER_ID_FIELD': 'email',
+    'USER_ID_CLAIM': 'email',
     'AUTH_COOKIE_HTTP_ONLY': True,
 }
 
