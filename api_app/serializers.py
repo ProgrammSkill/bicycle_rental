@@ -4,6 +4,7 @@ from rest_framework.exceptions import ValidationError
 from api_app.common_utils.token import get_token
 from api_app.models import User, Bicycle, Rental
 from rest_framework import serializers
+from django.utils import timezone
 
 
 class AuthSerializer(serializers.Serializer):
@@ -98,3 +99,23 @@ class BicycleSerializer(serializers.ModelSerializer):
     class Meta:
         model = Bicycle
         fields = '__all__'
+
+
+class RentalSerializer(serializers.ModelSerializer):
+    user = serializers.HiddenField(default=serializers.CurrentUserDefault())
+
+    class Meta:
+        model = Rental
+        fields = ('user', 'bicycle', 'start_time')
+
+    def validate(self, data):
+        # Проверка, что пользователь уже не арендует другой велосипед
+        user_rentals = Rental.objects.filter(user=data['user'], end_time__isnull=True)
+        if user_rentals.exists():
+            raise serializers.ValidationError("Вы уже арендуете другой велосипед.")
+
+        # Проверка, что выбранный велосипед доступен для аренды
+        if data['bicycle'].status == 'rented':
+            raise serializers.ValidationError("Выбранный велосипед уже арендован.")
+
+        return data
