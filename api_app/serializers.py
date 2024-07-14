@@ -106,7 +106,7 @@ class RentalSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Rental
-        fields = ('id', 'user', 'bicycle', 'start_time')
+        fields = ('id', 'user', 'bicycle', 'start_time', 'end_time', 'cost')
 
     def validate(self, data):
         # Проверка, что пользователь уже не арендует другой велосипед

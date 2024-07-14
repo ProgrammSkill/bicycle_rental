@@ -1,20 +1,19 @@
 from datetime import datetime
-
 from rest_framework import status, generics
 from rest_framework.exceptions import ValidationError
-from rest_framework.generics import CreateAPIView, GenericAPIView, RetrieveUpdateAPIView
+from rest_framework.generics import CreateAPIView
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from django.db.transaction import atomic
-from rest_framework.views import APIView
 from rest_framework_simplejwt.views import TokenRefreshView
 from rest_framework_simplejwt.exceptions import InvalidToken, TokenError
 from api_app.common_utils.token import get_token
 from api_app.serializers import AccountCreateSerializer, AuthSerializer, BicycleSerializer, RentalSerializer
 from .models import User, Bicycle, Rental
 from .common_utils.serializers import TokenRefreshSerializer
-from .swagger_content import account
+from .swagger_content import account, rental
 from .task import calculate_rental_cost
+
 
 @account.auth
 class AuthView(CreateAPIView):
@@ -62,6 +61,7 @@ class RefreshView(TokenRefreshView):
         return Response(serializer.validated_data, status=status.HTTP_200_OK)
 
 
+@rental.bicycles
 class BicycleListAPIView(generics.ListAPIView):
     serializer_class = BicycleSerializer
     permission_classes = [IsAuthenticated]
@@ -71,18 +71,26 @@ class BicycleListAPIView(generics.ListAPIView):
         return queryset
 
 
+@rental.rent_bicycles
 class RentalCreateAPIView(generics.CreateAPIView):
     queryset = Rental.objects.all()
     serializer_class = RentalSerializer
     permission_classes = [IsAuthenticated]
 
 
-# class ReturnBicycleCreateAPIView(generics.UpdateAPIView):
-#     queryset = Rental.objects.all()
-#     serializer_class = ReturnBicycleSerializer
-#     permission_classes = [IsAuthenticated]
+@rental.rental_history
+class RentalHistoryAPIView(generics.ListAPIView):
+    serializer_class = RentalSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        user = self.request.user
+        queryset = Rental.objects.filter(user=user)
+
+        return queryset
 
 
+@rental.return_bicycles
 class ReturnBicycleCreateAPIView(generics.CreateAPIView):
     queryset = Rental.objects.all()
     permission_classes = [IsAuthenticated]
@@ -90,14 +98,15 @@ class ReturnBicycleCreateAPIView(generics.CreateAPIView):
     def post(self, request, rental_id):
         user = self.request.user
 
-        user_rentals = Rental.objects.filter(user=user, pk=rental_id, bicycle__status='rented', end_time__isnull=True)
-        if not user_rentals.exists():
+        rentals = Rental.objects.filter(user=user,  bicycle__status='rented', end_time__isnull=True)
+        if not rentals.exists():
             raise ValidationError("У вас нет арендованного велосипеда для возврата.")
         try:
             rental = Rental.objects.get(pk=rental_id)
             rental.end_time = datetime.now()
-            # Запуск задачи Celery для расчета стоимости
+            # Запуск задачи Celery для расчета стоимости аренды
             rental.cost = calculate_rental_cost.delay(rental_id)
+            Bicycle.objects.filter(pk=rental.bicycle.id).update(status='available')
             rental.save()
 
             return Response({'message': f'Велосипед успешно возвращен, сумма оплаты составляет: {rental.cost}'})
