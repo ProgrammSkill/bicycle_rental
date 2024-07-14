@@ -182,3 +182,7 @@ STATICFILES_DIRS = []
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+CELERY_TIMEZONE = 'Europe/Moscow'
+CELERY_BROKER_URL = "redis://bicycle_rental_redis:6379"
+CELERY_RESULT_BACKEND = "redis://bicycle_rental_redis:6379"

@@ -106,7 +106,7 @@ class RentalSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Rental
-        fields = ('user', 'bicycle', 'start_time')
+        fields = ('id', 'user', 'bicycle', 'start_time')
 
     def validate(self, data):
         # Проверка, что пользователь уже не арендует другой велосипед
@@ -119,3 +119,12 @@ class RentalSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError("Выбранный велосипед уже арендован.")
 
         return data
+
+    def create(self, validated_data):
+        bicycle = Bicycle.objects.get(pk=validated_data['bicycle'].id)
+        bicycle.status = 'rented'
+        bicycle.save()
+
+        instance: Rental = super(RentalSerializer, self).create(validated_data)
+        instance.save()
+        return instance

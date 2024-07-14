@@ -1,0 +1,31 @@
+version: '3.3'
+
+services:
+  bicycle_rental:
+    image: bicycle_rental
+    container_name: bicycle_rental
+    build: .
+    ports:
+      - "4001:4001"
+    command: sh -c "gunicorn bicycle_rental.wsgi:application --bind 0.0.0.0:4001"
+    restart: always
+    env_file:
+      - ./.env
+    volumes:
+      - .:/app/
+
+  bicycle_rental_redis:
+    container_name: bicycle_rental_redis
+    image: "redis:alpine"
+
+  bicycle_rentall_celery:
+    container_name: bicycle_rental_celery
+    image: bicycle_rental
+    command: celery -A bicycle_rental worker --pool solo
+    volumes:
+      - ./:/app/
+    restart: always
+    env_file:
+      - ./.env
+    depends_on:
+      - bicycle_rental_redis
