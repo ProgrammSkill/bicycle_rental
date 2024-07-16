@@ -8,7 +8,8 @@ from django.db.transaction import atomic
 from rest_framework_simplejwt.views import TokenRefreshView
 from rest_framework_simplejwt.exceptions import InvalidToken, TokenError
 from api_app.common_utils.token import get_token
-from api_app.serializers import AccountCreateSerializer, AuthSerializer, BicycleSerializer, RentalSerializer
+from api_app.serializers import AccountCreateSerializer, AuthSerializer, BicycleSerializer, RentalSerializer, \
+    RentalHistorySerializer
 from .models import User, Bicycle, Rental
 from .common_utils.serializers import TokenRefreshSerializer
 from .swagger_content import account, rental
@@ -80,7 +81,7 @@ class RentalCreateAPIView(generics.CreateAPIView):
 
 @rental.rental_history
 class RentalHistoryAPIView(generics.ListAPIView):
-    serializer_class = RentalSerializer
+    serializer_class = RentalHistorySerializer
     permission_classes = [IsAuthenticated]
 
     def get_queryset(self):

@@ -106,7 +106,7 @@ class RentalSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Rental
-        fields = ('id', 'user', 'bicycle', 'start_time', 'end_time', 'cost')
+        fields = ('id', 'user', 'bicycle')
 
     def validate(self, data):
         # Проверка, что пользователь уже не арендует другой велосипед
@@ -128,3 +128,12 @@ class RentalSerializer(serializers.ModelSerializer):
         instance: Rental = super(RentalSerializer, self).create(validated_data)
         instance.save()
         return instance
+
+
+class RentalHistorySerializer(serializers.ModelSerializer):
+    user = serializers.HiddenField(default=serializers.CurrentUserDefault())
+
+    class Meta:
+        model = Rental
+        fields = ('id', 'user', 'bicycle', 'start_time', 'end_time', 'cost')
+
