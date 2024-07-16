@@ -1,6 +1,12 @@
 version: '3.3'
 
 services:
+  bicycle_rental_db:
+    container_name: bicycle_rental_db
+    image: postgres:15.0
+    restart: always
+    env_file:
+      - ./.env
   bicycle_rental:
     image: bicycle_rental
     container_name: bicycle_rental

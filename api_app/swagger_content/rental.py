@@ -5,6 +5,10 @@ bicycles = extend_schema_view(
     get=extend_schema(
         summary="Список доступных велосипедов",
         tags=['Rental']
+    ),
+    post=extend_schema(
+        summary="Создать велосипед",
+        tags=['Rental']
     )
 )
 

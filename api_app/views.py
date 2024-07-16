@@ -62,7 +62,7 @@ class RefreshView(TokenRefreshView):
 
 
 @rental.bicycles
-class BicycleListAPIView(generics.ListAPIView):
+class BicycleListAPIView(generics.ListAPIView, generics.CreateAPIView):
     serializer_class = BicycleSerializer
     permission_classes = [IsAuthenticated]
 

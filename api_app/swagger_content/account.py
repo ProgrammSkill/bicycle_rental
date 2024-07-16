@@ -5,6 +5,7 @@ from api_app.serializers import AccountCreateSerializer
 
 auth = extend_schema_view(
     post=extend_schema(
+        summary="Авторизация",
         tags=['Sign in and sign up'],
         request=inline_serializer('auth_request', {
             'email': serializers.CharField(),
@@ -21,6 +22,7 @@ auth = extend_schema_view(
 
 create = extend_schema_view(
     post=extend_schema(
+        summary="Регистрация",
         tags=['Sign in and sign up'],
         responses={
             '200': inline_serializer('user_create_response', {
@@ -34,6 +36,7 @@ create = extend_schema_view(
 
 refresh = extend_schema_view(
     post=extend_schema(
+        summary="Обновить токен",
         tags=['Sign in and sign up']
     )
 )
